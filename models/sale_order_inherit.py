@@ -346,10 +346,9 @@ class SaleOrderInherit(models.Model):
             'is_amended': 1
         }
         return amendment_details
-
     # data_dict.get('price_unit', order_line.price_unit)
 
-    def action_extend(self):
+    def action_extend(self,values):
         try:
             connection = self._get_connection()
             connection.autocommit = False
@@ -357,8 +356,8 @@ class SaleOrderInherit(models.Model):
 
             _logger.info("evt=EXTEND_ORDER msg=Saving PO data")
 
-            cursor.execute("INSERT INTO extensions (order_id, old_rental_order) SELECT id as order_id, rental_order as old_rental_order FROM orders WHERE id = %s",(self.beta_order_id,))
-            cursor.execute("UPDATE quotations SET pickup_date=%s WHERE order_id=%s",(self.pickup_date, self.beta_order_id))
+            # cursor.execute("INSERT INTO extensions (order_id, old_rental_order) SELECT id as order_id, rental_order as old_rental_order FROM orders WHERE id = %s",(self.beta_order_id,))
+            cursor.execute("UPDATE quotations SET pickup_date=%s WHERE order_id=%s",(values['extend_order_pickup_date'],self.beta_order_id))
             cursor.execute("UPDATE orders SET rental_order = %s WHERE id = %s",[self._get_document_if_exists('rental_order'), self.beta_order_id])
             cursor.execute("UPDATE challans SET deleted_at = current_timestamp WHERE deleted_at IS NULL AND challan_type = 'Pickup' AND challans.recieving IS NULL AND order_id = %s",(self.beta_order_id,))
             connection.commit()
