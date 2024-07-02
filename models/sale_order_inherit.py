@@ -13,6 +13,8 @@ import datetime
 
 import pytz
 
+from datetime import datetime
+
 _logger = logging.getLogger(__name__)
 
 from odoo.exceptions import UserError, ValidationError
