@@ -902,7 +902,7 @@ class SaleOrderInherit(models.Model):
         for record in self:
             data = {
                 'order_id': record.beta_order_id,
-                'date': datetime.now().strftime('%Y-%m-%d')
+                'date': fields.Datetime.now().strftime('%Y-%m-%d')
             }
 
             headers = {
