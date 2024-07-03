@@ -735,7 +735,6 @@ class SaleOrderInherit(models.Model):
     def _generate_job_number(self, created_by, customer_id, quotation_id):
         today = datetime.date.today()
         job_order_number = str(today.year) + "/" + today.strftime("%b") + "/" + self.jobsite_id.name + "/" + str(created_by) + "/" + str(customer_id)
-
         if self.po_number:
             job_order_number = job_order_number + "/" + self.po_number
 
@@ -903,7 +902,7 @@ class SaleOrderInherit(models.Model):
         for record in self:
             data = {
                 'order_id': record.beta_order_id,
-                'date': datetime.now().strftime('%Y-%m-%d')
+                'date': fields.Datetime.now().strftime('%Y-%m-%d')
             }
 
             headers = {
@@ -953,7 +952,8 @@ class SaleOrderInherit(models.Model):
             if self._update_customer_status_on_beta():
                 self.partner_id.cpl_status = 'BLOCKED'
             else:
-                raise UserError("Failed to update customer status on beta system.")
+                raise UserError("Failed to update customer status on beta ")
+
     def _update_customer_status_on_beta(self):
         try:
             connection = self._get_connection()
@@ -964,17 +964,21 @@ class SaleOrderInherit(models.Model):
             customer_master_id = cursor.fetchone()
 
             if customer_master_id:
-                cursor.execute("UPDATE customer_masters SET status = 'BLOCK' WHERE id = %s",
-                               (customer_master_id['id'],))
-                cursor.execute("UPDATE customers SET status = 'BLOCK' WHERE customer_master_id = %s",
-                               (customer_master_id['id'],))
+                customer_master_id = customer_master_id[0]
 
+                cursor.execute("UPDATE customer_masters SET status = 'BLOCK' WHERE id = %s", (customer_master_id,))
+                cursor.execute("UPDATE customers SET status = 'BLOCK' WHERE customer_master_id = %s",
+                               (customer_master_id,))
             connection.commit()
             return True
         except Exception as e:
             connection.rollback()
             _logger.error(f"An error occurred: {e}")
             return False
+        finally:
+            cursor.close()
+            connection.close()
+
 
 
 
