@@ -966,14 +966,14 @@ class SaleOrderInherit(models.Model):
             connection.autocommit = False
             cursor = connection.cursor()
 
-            cursor.execute("SELECT * FROM customer_masters WHERE gstn = %s", (self.partner_id.gstn,))
-            customer_at_beta = cursor.fetchone()
+            cursor.execute("SELECT customer_master_id FROM customers WHERE gstn = %s", (self.partner_id.gstn,))
+            customer_master_id = cursor.fetchone()
 
-            if customer_at_beta:
+            if customer_master_id:
                 cursor.execute("UPDATE customer_masters SET status = 'BLOCK' WHERE id = %s",
-                               (customer_at_beta['id'],))
+                               (customer_master_id['id'],))
                 cursor.execute("UPDATE customers SET status = 'BLOCK' WHERE customer_master_id = %s",
-                               (customer_at_beta['id'],))
+                               (customer_master_id['id'],))
 
             connection.commit()
             return True
