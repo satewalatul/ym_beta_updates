@@ -10,16 +10,10 @@ import requests
 import traceback
 import mimetypes
 import datetime
-
 import pytz
-
-from datetime import datetime
-
 _logger = logging.getLogger(__name__)
 
 from odoo.exceptions import UserError, ValidationError
-
-from odoo.exceptions import UserError
 
 
 def get_create_by(created_by_result):
