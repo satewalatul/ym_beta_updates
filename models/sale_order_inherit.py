@@ -943,7 +943,7 @@ class SaleOrderInherit(models.Model):
 
     def _block_jobsite_or_customer(self):
         if self.partner_id.credit_rating == 'A':
-            if self.partner_id.id not in self.jobsite_id.blocked_customer_list.ids:
+            if self.partner_id.id not in self.jobsite_id.blocked_customer_list.blocked_customer_id.ids:
                 self.env['jobsite.blocked.customers'].create({
                     'jobsite_id': self.jobsite_id.id,
                     'blocked_customer_id': self.partner_id.id,
