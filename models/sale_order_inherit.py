@@ -960,7 +960,10 @@ class SaleOrderInherit(models.Model):
             connection.autocommit = False
             cursor = connection.cursor()
 
-            cursor.execute("SELECT customer_master_id FROM customers WHERE gstn = %s", (self.partner_id.gstn,))
+            cursor.execute(
+                "SELECT customer_master_id FROM customers WHERE id = (SELECT customer_id FROM orders WHERE id = %s)",
+                (self.beta_order_id,)
+            )
             customer_master_id = cursor.fetchone()
 
             if customer_master_id:
