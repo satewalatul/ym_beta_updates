@@ -983,6 +983,28 @@ class SaleOrderInherit(models.Model):
             connection.close()
 
 
+    def _get_project_manager(self,order_id):
+        return [
+            {'contact_crm_id': self.project_manager.id, 'order_id': order_id}
+        ]
+
+    def _send_project_manager_to_beta(self):
+        try:
+            connection = self._get_connection()
+            connection.autocommit = False
+            cursor = connection.cursor()
+            order_id = self.beta_order_id
+            cursor.execute(_get_contact_notification_insert_query(), self._get_project_manager(order_id))
+            connection.commit()
+            return True
+        except Exception as e:
+            connection.rollback()
+            _logger.error(f"An error occurred: {e}")
+            return False
+        finally:
+            cursor.close()
+            connection.close()
+
 
 
 
