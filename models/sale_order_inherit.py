@@ -97,7 +97,14 @@ def _get_cheque_details_insert_query():
     return "INSERT INTO customer_security_cheque (customer_id, order_id, cheque_no, cheque_amount, cheque_date,bank, lapsed, verified, cheque_ownership, security_cheque) VALUES(%(customer_id)s, %(order_id)s, %(cheque_no)s, %(cheque_amount)s, %(cheque_date)s, %(bank)s, %(lapsed)s, %(verified)s, %(cheque_ownership)s, %(security_cheque)s)"
 
 def _get_contact_notification_insert_query():
-    return "INSERT INTO order_contact_notification (order_id, contact_crm_id) VALUES(%(order_id)s, %(contact_crm_id)s)"
+    return """
+    INSERT INTO order_contact_notification (order_id, contact_crm_id)
+    SELECT %(order_id)s, %(contact_crm_id)s
+    WHERE NOT EXISTS (
+        SELECT 1 FROM order_contact_notification 
+        WHERE order_id = %(order_id)s AND contact_crm_id = %(contact_crm_id)s
+    )
+    """
 
 def get_beta_godown_id_by_name_query(godown_name):
     return "SELECT id from locations where type='godown' and location_name = '{}'".format(godown_name)
@@ -983,10 +990,8 @@ class SaleOrderInherit(models.Model):
             connection.close()
 
 
-    def _get_project_manager(self,order_id):
-        return [
-            {'contact_crm_id': self.project_manager.id, 'order_id': order_id}
-        ]
+    def _get_project_manager(self, order_id):
+        return {'contact_crm_id': self.project_manager.id, 'order_id': order_id}
 
     def _send_project_manager_to_beta(self):
         try:
