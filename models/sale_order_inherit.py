@@ -43,7 +43,7 @@ def get_beta_godown_id(godown_result):
 
 
 def get_quotation_insert_query():
-    return "INSERT INTO quotations (created_by, customer_id, contact_name, phone_number, site_name, price_type, total, freight, gstn, billing_address_line, billing_address_city, billing_address_pincode, delivery_address_line, delivery_address_city, delivery_address_pincode, delivery_date, pickup_date, security_amt, freight_payment, godown_id, crm_account_id, created_at, updated_at) VALUES (%(created_by)s, %(customer_id)s, %(contact_name)s, %(phone_number)s, %(site_name)s, %(price_type)s, %(total)s, %(freight)s, %(gstn)s, %(billing_address_line)s, %(billing_address_city)s, %(billing_address_pincode)s, %(delivery_address_line)s, %(delivery_address_city)s, %(delivery_address_pincode)s, %(delivery_date)s, %(pickup_date)s, %(security_amt)s, %(freight_payment)s, %(godown_id)s, %(crm_account_id)s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
+    return "INSERT INTO quotations (created_by, customer_id, contact_name, phone_number, site_name, price_type, total, freight, gstn, billing_address_line, billing_address_city, billing_address_pincode, delivery_address_line, delivery_address_city, delivery_address_pincode, delivery_date, pickup_date, security_amt, freight_payment, godown_id, crm_account_id,computed_freight_amount,overidden_freight,computed_vehicle_type, created_at, updated_at) VALUES (%(created_by)s, %(customer_id)s, %(contact_name)s, %(phone_number)s, %(site_name)s, %(price_type)s, %(total)s, %(freight)s, %(gstn)s, %(billing_address_line)s, %(billing_address_city)s, %(billing_address_pincode)s, %(delivery_address_line)s, %(delivery_address_city)s, %(delivery_address_pincode)s, %(delivery_date)s, %(pickup_date)s, %(security_amt)s, %(freight_payment)s, %(godown_id)s, %(crm_account_id)s,%(computed_freight_amount)s,%(overidden_freight)s,%(computed_vehicle_type)s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)"
 
 
 def get_quotation_items_insert_query():
@@ -857,6 +857,9 @@ class SaleOrderInherit(models.Model):
             'godown_id': beta_godown_id,
             'sign_type': 'MANUAL',
             'crm_account_id': self.id,
+            'computed_freight_amount':self.computed_freight_amount,
+            'overidden_freight':self.overidden_freight,
+            'computed_vehicle_type':self.vehicle_type
         }
 
     def _get_connection(self):
